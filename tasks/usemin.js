@@ -105,19 +105,35 @@ module.exports = function (grunt) {
 
   grunt.registerMultiTask('usemin', 'Replaces references to non-minified scripts / stylesheets', function () {
     var debug = require('debug')('usemin:usemin');
+    var type = this.target;
+    // If type is not html/css/js and the customized configuration provides 'type' in options. Below is the example.
+    // usemin: {
+    //  test: {
+    //    src : ['dist/index.html'],
+    //    options: {
+    //      type: 'html',
+    //      assertDirs: ['****']
+    //    }
+    //  }
+    // }
+    if ((type !== 'html' && type !== 'css' && type !== 'js') && grunt.config('usemin')[this.target] && grunt.config('usemin')[this.target].options && grunt.config('usemin')[this.target].options.type) {
+      type = grunt.config('usemin')[this.target].options.type;
+    } // else leave as current implementation
+
+    // grunt.config('usemin')[this.target].options.type
+
     var options = this.options({
-      type: this.target
+      type: type
     });
     var blockReplacements = options.blockReplacements || {};
 
     debug('Looking at %s target', this.target);
     var patterns = [];
-    var type = this.target;
 
     // Check if we have a user defined pattern
-    if (options.patterns && options.patterns[this.target]) {
-      debug('Adding user defined patterns for %s', this.target);
-      patterns = options.patterns[this.target];
+    if (options.patterns && options.patterns[type]) {
+      debug('Adding user defined patterns for %s', type);
+      patterns = options.patterns[type];
     }
 
     // var locator = options.revmap ? grunt.file.readJSON(options.revmap) : function (p) { return grunt.file.expand({filter: 'isFile'}, p); };
